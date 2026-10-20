@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+  <title id="page-doc-title">萬用視覺化戰術複習系統</title>
+  <!-- Tailwind CSS 本地離線引擎 (100% 免連網) -->
+  <script src="tailwind.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      --bg-main: #060b14;
+      --bg-panel: #0b1323;
+      --bg-card: #0f172a;
+      --border-main: #1e293b;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+    }
+    html.light {
+      --bg-main: #f8fafc;
+      --bg-panel: #ffffff;
+      --bg-card: #f1f5f9;
+      --border-main: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+    }
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Noto Sans TC', system-ui, sans-serif;
+      min-height: 100vh;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    /* 明亮護眼模式自動色彩反轉調適 */
+    html.light .bg-\[\#070d19\]\/90,
+    html.light .bg-\[\#070d19\]\/95 {
+      background-color: rgba(255, 255, 255, 0.94) !important;
+    }
+    html.light .bg-\[\#0b1323\],
+    html.light .bg-\[\#0b1323\]\/90,
+    html.light .bg-\[\#0b1323\]\/95 {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06) !important;
+    }
+    html.light .bg-slate-900,
+    html.light .bg-slate-900\/95,
+    html.light .bg-slate-900\/90,
+    html.light .bg-slate-900\/85,
+    html.light .bg-slate-900\/80,
+    html.light .bg-slate-900\/60 {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    html.light .bg-slate-800,
+    html.light .bg-slate-800\/90,
+    html.light .bg-slate-800\/80 {
+      background-color: #e2e8f0 !important;
+      border-color: #cbd5e1 !important;
+      color: #1e293b !important;
+    }
+    html.light .text-white,
+    html.light .text-slate-100,
+    html.light .text-slate-200 {
+      color: #0f172a !important;
+    }
+    html.light .text-slate-300,
+    html.light .text-slate-400 {
+      color: #475569 !important;
+    }
+    html.light .text-cyan-300,
+    html.light .text-cyan-400 {
+      color: #0369a1 !important;
+    }
+    html.light .text-amber-300,
+    html.light .text-amber-400 {
+      color: #b45309 !important;
+    }
+    html.light .text-emerald-300,
+    html.light .text-emerald-400 {
+      color: #047857 !important;
+    }
+    html.light .text-rose-300,
+    html.light .text-rose-400 {
+      color: #be123c !important;
+    }
+    html.light .bg-emerald-950\/40,
+    html.light .bg-emerald-950\/60,
+    html.light .bg-emerald-950\/70 {
+      background-color: #ecfdf5 !important;
+      color: #065f46 !important;
+    }
+    html.light .bg-amber-950\/20,
+    html.light .bg-amber-950\/60 {
+      background-color: #fffbeb !important;
+      color: #92400e !important;
+    }
+    html.light .bg-cyan-950\/20,
+    html.light .bg-cyan-950\/30,
+    html.light .bg-cyan-950\/60,
+    html.light .bg-cyan-950\/80 {
+      background-color: #f0f9ff !important;
+      color: #075985 !important;
+    }
+    html.light .bg-rose-950\/40,
+    html.light .bg-rose-950\/50,
+    html.light .bg-rose-950\/60 {
+      background-color: #fff1f2 !important;
+      color: #9f1239 !important;
+    }
+    .ecg-frame {
+      background-color: #ffffff;
+      background-image:
+        linear-gradient(rgba(244, 63, 94, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(244, 63, 94, 0.08) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    mark.trigger-mark {
+      background: rgba(6, 182, 212, 0.25);
+      color: inherit;
+      border-bottom: 2px solid #06b6d4;
+      padding: 0 4px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    button, label, select, input, textarea {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pinch-zoom-container {
+      touch-action: pan-x pan-y pinch-zoom;
+      -webkit-overflow-scrolling: touch;
+    }
+    @media (max-width: 1023px) {
+      body { padding-bottom: 76px; }
+    }
+  </style>
+</head>
+<body class="selection:bg-cyan-500/30 antialiased">
+
+  <!-- ==================== 頂部導覽列 ==================== -->
+  <header class="sticky top-0 z-30 border-b border-slate-800/80 bg-[#070d19]/90 backdrop-blur-md">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 border border-cyan-500/40 flex items-center justify-center text-lg shadow-lg">
+          <span id="brand-icon">🎯</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 id="brand-title" class="text-base sm:text-lg font-black tracking-wide text-white">
+              萬用考題拆解與視覺化複習系統
+            </h1>
+            <span id="brand-badge" class="hidden md:inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+              Exam Engine
+            </span>
+          </div>
+          <p id="brand-subtitle" class="text-xs text-slate-400 hidden sm:block">
+            演算法決策路徑定位 ‧ 易混淆陷阱拆解 ‧ 最新法規與觀念檢核
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center flex-wrap gap-2 sm:gap-2.5">
+        <div class="hidden xl:flex items-center gap-4 bg-slate-900/90 border border-slate-800 px-3.5 py-1.5 rounded-xl text-xs">
+          <div>
+            <span class="text-slate-400">總進度：</span>
+            <span id="nav-answered-count" class="font-mono font-bold text-white">0 / 0</span>
+          </div>
+          <div class="h-3.5 w-[1px] bg-slate-800"></div>
+          <div>
+            <span class="text-slate-400">總正確率：</span>
+            <span id="nav-accuracy-rate" class="font-mono font-bold text-emerald-400">--%</span>
+          </div>
+          <div class="h-3.5 w-[1px] bg-slate-800"></div>
+          <div>
+            <span class="text-slate-400">待加強：</span>
+            <span id="nav-star-count" class="font-mono font-bold text-amber-400">0</span>
+          </div>
+        </div>
+
+        <!-- 🌙 / ☀️ 深淺雙主題切換按鈕 -->
+        <button onclick="toggleThemeMode()" id="btn-theme-toggle" class="flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" title="切換深色戰情室 / 明亮護眼主題">
+          <span id="theme-icon">🌙</span>
+          <span id="theme-text" class="hidden sm:inline">深色戰情室</span>
+        </button>
+
+        <!-- ⚡ 易混淆速查表按鈕 -->
+        <button onclick="openCheatSheetModal()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl font-bold text-xs sm:text-sm bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-lg shadow-amber-500/20 transition">
+          <span>⚡</span>
+          <span id="cheatsheet-btn-label">易混淆速查表</span>
+        </button>
+
+        <!-- 題號矩陣總覽按鈕 -->
+        <button onclick="openQuestionMatrixModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-xl font-semibold text-xs sm:text-sm bg-slate-800/90 hover:bg-slate-700 text-slate-200 border border-slate-700 transition">
+          <span>🔢 題號總覽</span>
+        </button>
+
+        <!-- 進度管理選單 -->
+        <div class="relative">
+          <button onclick="toggleDataMenu()" class="flex items-center gap-1 px-2.5 py-2 rounded-xl text-xs sm:text-sm bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition">
+            <span>⚙️</span>
+            <span class="hidden sm:inline">進度管理</span>
+          </button>
+          <div id="data-menu-dropdown" class="hidden absolute right-0 mt-2 w-52 rounded-xl bg-slate-900 border border-slate-700 shadow-2xl py-1.5 z-50 text-xs">
+            <button onclick="exportProgressJSON()" class="w-full px-4 py-2 text-left text-slate-200 hover:bg-slate-800 flex items-center gap-2">
+              <span>📥</span> <span>匯出學習進度 (.json)</span>
+            </button>
+            <label class="w-full px-4 py-2 text-left text-slate-200 hover:bg-slate-800 flex items-center gap-2 cursor-pointer">
+              <span>📤</span> <span>匯入學習進度 (.json)</span>
+              <input type="file" id="import-json-input" accept=".json" class="hidden" onchange="importProgressJSON(event)" />
+            </label>
+            <div class="my-1 border-t border-slate-800"></div>
+            <button onclick="resetAllProgress()" class="w-full px-4 py-2 text-left text-rose-400 hover:bg-rose-950/40 flex items-center gap-2 font-semibold">
+              <span>🗑️</span> <span>重置所有刷題紀錄</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== 主內容容器 ==================== -->
+  <main class="max-w-[1600px] mx-auto px-4 sm:px-6 py-4 space-y-4">
+
+    <!-- 1. 頂部弱點雷達與多維度過濾器 -->
+    <section class="bg-[#0b1323]/90 border border-slate-800/90 rounded-2xl p-4 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-5 rounded-full bg-cyan-400"></span>
+          <h2 class="text-sm font-bold text-slate-200 tracking-wide">核心領域弱點雷達（點擊卡片可快速篩選該分類；低於 70% 自動警示）</h2>
+        </div>
+        <button onclick="toggleRadarCollapse()" class="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1">
+          <span id="radar-collapse-text">收合雷達</span>
+        </button>
+      </div>
+
+      <div id="category-radar-grid" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2.5"></div>
+
+      <div class="pt-2 border-t border-slate-800/80 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="setFilterMode('all')" data-mode="all" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            全部 (<span id="count-all">0</span>)
+          </button>
+          <button onclick="setFilterMode('unanswered')" data-mode="unanswered" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            未作答 (<span id="count-unanswered">0</span>)
+          </button>
+          <button onclick="setFilterMode('wrong')" data-mode="wrong" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            ❌ 答錯題庫 (<span id="count-wrong">0</span>)
+          </button>
+          <button onclick="setFilterMode('starred')" data-mode="starred" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            ⭐ 觀念模糊 (<span id="count-starred">0</span>)
+          </button>
+          <button onclick="setFilterMode('ecg')" data-mode="ecg" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            📈 圖表/圖形題 (<span id="count-ecg">0</span>)
+          </button>
+          <button onclick="setFilterMode('disputed')" data-mode="disputed" class="filter-pill px-3 py-1.5 rounded-lg text-xs font-bold transition">
+            ⚖️ 爭議題/多解題 (<span id="count-disputed">0</span>)
+          </button>
+        </div>
+
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+          <div class="flex items-center bg-slate-900 border border-slate-700/80 rounded-xl p-1 text-xs">
+            <span class="px-2 text-slate-400 font-medium">來源/年度：</span>
+            <select id="year-select" onchange="setYearFilter(this.value)" class="bg-transparent text-white font-mono font-bold focus:outline-none pr-2 cursor-pointer">
+              <option value="all" class="bg-slate-900">全部</option>
+            </select>
+          </div>
+
+          <div class="relative flex-1 sm:w-64">
+            <input
+              type="text"
+              id="search-input"
+              oninput="handleSearchInput(this.value)"
+              placeholder="搜尋題幹、關鍵字、筆記..."
+              class="w-full bg-slate-900/95 border border-slate-700/80 focus:border-cyan-500 rounded-xl pl-3.5 pr-8 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none transition"
+            />
+            <button id="clear-search-btn" onclick="clearSearchInput()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">✕</button>
+          </div>
+
+          <button onclick="resetFilters()" id="reset-filter-btn" class="hidden px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/15 text-rose-300 border border-rose-500/30 hover:bg-rose-500/25 transition whitespace-nowrap">
+            清除篩選
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div id="empty-state-box" class="hidden bg-[#0b1323] border border-slate-800 rounded-2xl p-12 text-center space-y-3">
+      <div class="text-4xl">🔍</div>
+      <h3 class="text-lg font-bold text-white">目前篩選條件下沒有符合的試題</h3>
+      <button onclick="resetFilters()" class="mt-2 px-4 py-2 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 hover:bg-cyan-400 transition">
+        返回全部題目
+      </button>
+    </div>
+
+    <!-- 2. 左欄刷題區 + 3. 右欄解析區 -->
+    <div id="main-workspace" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+      <section class="lg:col-span-7 bg-[#0b1323]/95 border border-slate-800/90 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div class="px-5 py-3.5 bg-slate-900/90 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center flex-wrap gap-2">
+            <span id="q-index-badge" class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700">#1</span>
+            <span id="q-id-badge" class="text-sm font-mono font-black px-3 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 border border-cyan-500/40">ID</span>
+            <span id="q-category-badge" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">分類</span>
+            <span id="q-disputed-badge" class="hidden text-xs font-bold px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40">⚖️ 歷年爭議題</span>
+            <span id="q-ecg-badge" class="hidden text-xs font-bold px-2.5 py-1 rounded-lg bg-rose-500/15 text-rose-300 border border-rose-500/30">📈 附圖表</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="btn-toggle-triggers" onclick="toggleTriggerHints()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition">
+              <span>💡</span> <span id="trigger-btn-text">破題線索</span>
+            </button>
+            <button id="btn-toggle-star" onclick="toggleStarCurrent()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition">
+              <span id="star-icon">☆</span> <span id="star-text">標記待加強</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="p-5 sm:p-6 space-y-4">
+          <div id="trigger-pills-box" class="hidden bg-cyan-950/30 border border-cyan-500/30 rounded-xl p-3 space-y-1.5">
+            <div class="text-[11px] font-bold text-cyan-300">🎯 本題破題關鍵字 (Key Triggers)：</div>
+            <div id="trigger-pills-list" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
+          <div id="q-stem-text" class="text-base sm:text-lg font-semibold text-slate-100 leading-relaxed tracking-wide select-text"></div>
+
+          <div id="q-image-container" class="hidden space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+              <span class="font-medium text-cyan-300">🔍 考題附圖（點擊圖片可全螢幕放大與雙指縮放）</span>
+              <button onclick="openLightbox()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition">
+                ⛶ 全螢幕放大
+              </button>
+            </div>
+            <div onclick="openLightbox()" class="ecg-frame rounded-xl p-2 sm:p-3 border-2 border-slate-700 hover:border-cyan-400 transition cursor-zoom-in shadow-inner overflow-hidden">
+              <img id="q-ecg-image" src="" alt="考題圖表" class="max-h-[380px] w-auto mx-auto object-contain rounded" />
+            </div>
+          </div>
+
+          <div id="q-options-list" class="space-y-2.5 pt-2"></div>
+
+          <div id="q-result-banner" class="hidden rounded-xl p-3.5 border flex flex-wrap items-center justify-between gap-2">
+            <div id="q-result-text" class="text-sm font-bold flex items-center gap-2"></div>
+            <button onclick="clearCurrentAnswer()" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+              🔄 重新作答
+            </button>
+          </div>
+
+          <div class="pt-3 border-t border-slate-800/80">
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="q-user-note" class="text-xs font-bold text-slate-400">📝 個人記憶口訣 / 錯題筆記（自動儲存於本機）：</label>
+              <span id="note-save-indicator" class="text-[11px] text-emerald-400 opacity-0 transition">✓ 已自動儲存</span>
+            </div>
+            <textarea
+              id="q-user-note"
+              rows="2"
+              oninput="handleNoteInput(this.value)"
+              placeholder="在此輸入本題的個人口訣或重點筆記..."
+              class="w-full bg-slate-900/90 border border-slate-800 focus:border-cyan-500/70 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none transition resize-y"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="px-5 py-3.5 bg-slate-900/90 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 mt-auto">
+          <button onclick="prevQuestion()" id="btn-prev-q" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition disabled:opacity-40">
+            <span>←</span> <span>上一題</span>
+          </button>
+          <div class="hidden sm:flex items-center gap-2 text-[11px] text-slate-400 font-mono">
+            <span class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">1~4/A~D</span> 作答
+            <span class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">←/→</span> 換題
+            <span class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">S</span> 星號
+            <span class="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">H</span> 線索
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="revealAnalysisManually()" id="btn-reveal-analysis" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 transition">
+              👁️ 直接看解析
+            </button>
+            <button onclick="nextQuestion()" id="btn-next-q" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-md transition disabled:opacity-40">
+              <span>下一題</span> <span>→</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. 右欄深度解析面板 -->
+      <aside class="lg:col-span-5 space-y-4">
+        <div id="analysis-locked-card" class="bg-[#0b1323]/95 border border-slate-800/90 rounded-2xl p-8 text-center space-y-4 shadow-2xl">
+          <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-2xl">🧠</div>
+          <h3 class="text-base font-bold text-white">視覺化思考路徑 ＆ 防混淆深度解析待命</h3>
+          <p class="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
+            請先於左側選擇 <span class="text-cyan-300 font-mono font-bold">A / B / C / D</span> 作答，系統將立即展開三維度深度拆解。
+          </p>
+          <button onclick="revealAnalysisManually()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 transition">
+            👁️ 不作答直接展開深度解析
+          </button>
+        </div>
+
+        <div id="analysis-unlocked-container" class="hidden space-y-4">
+          <div class="bg-[#0b1323]/95 border border-emerald-500/30 rounded-2xl p-5 shadow-xl space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-300 text-xs font-black">1</span>
+              <h3 id="card-title-algorithm" class="text-sm font-black text-emerald-300 tracking-wide">解題思考決策路徑 (Step-by-Step Path)</h3>
+            </div>
+            <div id="algorithm-flowchart-box" class="pt-1 space-y-1"></div>
+          </div>
+
+          <div class="bg-[#0b1323]/95 border border-amber-500/40 rounded-2xl p-5 shadow-xl space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 text-xs font-black">2</span>
+              <h3 id="card-title-trap" class="text-sm font-black text-amber-300 tracking-wide">易混淆誘答陷阱拆解 (Confusion Trap Alert)</h3>
+            </div>
+            <div id="disputed-detail-alert" class="hidden rounded-xl bg-rose-950/50 border border-rose-500/50 p-3 text-xs space-y-1">
+              <div class="font-bold text-rose-300 flex items-center gap-1.5">
+                <span>⚖️ 官方公告爭議題 / 送分題：</span>
+                <span id="disputed-official-ans" class="font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-200 border border-rose-400/40"></span>
+              </div>
+            </div>
+            <ul id="confusion-trap-list" class="space-y-2.5 text-xs sm:text-sm text-slate-200 leading-relaxed"></ul>
+          </div>
+
+          <div class="bg-[#0b1323]/95 border border-cyan-500/35 rounded-2xl p-5 shadow-xl space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-lg bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-300 text-xs font-black">3</span>
+              <h3 id="card-title-guideline" class="text-sm font-black text-cyan-300 tracking-wide">最新法規 / 指引 / 課綱核心觀念檢核</h3>
+            </div>
+            <ul id="guideline-check-list" class="space-y-2.5 text-xs sm:text-sm text-slate-200 leading-relaxed"></ul>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- 全螢幕圖片放大檢視器 (Lightbox) -->
+  <div id="lightbox-modal" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex flex-col items-center justify-center p-4">
+    <div class="max-w-6xl w-full flex flex-wrap items-center justify-between gap-2 mb-3 px-2">
+      <div class="flex items-center gap-2">
+        <span id="lightbox-title" class="text-xs sm:text-sm font-mono font-bold text-cyan-300 bg-slate-900 px-3 py-1 rounded-lg border border-cyan-500/30">圖表檢視</span>
+        <span class="text-xs text-emerald-300 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded">👌 支援雙指縮放或點擊倍率切換</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleLightboxZoom()" id="btn-lightbox-zoom" class="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-500/40 text-xs font-bold transition">
+          🔍 切換 200% 放大
+        </button>
+        <button onclick="closeLightbox()" class="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition">
+          ✕ 關閉 (ESC)
+        </button>
+      </div>
+    </div>
+    <div id="lightbox-scroll-area" onclick="closeLightbox()" class="pinch-zoom-container w-full flex-1 flex items-center justify-center overflow-auto cursor-zoom-out">
+      <img id="lightbox-img" src="" alt="放大圖表" onclick="event.stopPropagation(); toggleLightboxZoom();" class="max-w-full max-h-[85vh] object-contain bg-white p-2 sm:p-3 rounded-2xl shadow-2xl border-2 border-cyan-500/40 cursor-zoom-in transition-all duration-200" />
+    </div>
+  </div>
+
+  <!-- 題號矩陣總覽彈窗 -->
+  <div id="matrix-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0b1323] border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-black text-white">題號快速跳轉矩陣</h3>
+          <p class="text-xs text-slate-400">綠色＝答對｜紅色＝答錯｜琥珀框＝星號待加強</p>
+        </div>
+        <button onclick="closeQuestionMatrixModal()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold">✕ 關閉</button>
+      </div>
+      <div id="matrix-grid-container" class="p-5 overflow-y-auto grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2"></div>
+    </div>
+  </div>
+
+  <!-- 4. 易混淆速查抽屜 (Quick Cheat Sheet Modal) -->
+  <div id="cheatsheet-modal" class="hidden fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-[#0b1323] border border-amber-500/40 rounded-2xl max-w-6xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 bg-slate-900 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-lg">⚡</span>
+          <div>
+            <h2 id="cheatsheet-modal-title" class="text-base sm:text-lg font-black text-white">考前終極易混淆速查表</h2>
+            <p id="cheatsheet-modal-subtitle" class="text-xs text-slate-400">跨年度高頻考點與易錯比較總整理</p>
+          </div>
+        </div>
+        <button onclick="closeCheatSheetModal()" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-rose-600 text-slate-200 hover:text-white text-xs font-bold transition">
+          ✕ 關閉速查表 (ESC)
+        </button>
+      </div>
+      <div id="cheatsheet-tabs-header" class="px-5 pt-3 bg-slate-900/60 border-b border-slate-800 flex flex-wrap gap-1.5"></div>
+      <div id="cheatsheet-tabs-body" class="p-5 overflow-y-auto space-y-5 text-xs sm:text-sm leading-relaxed"></div>
+    </div>
+  </div>
+
+  <!-- 手機/平板專屬底部懸浮快速切換列 -->
+  <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#070d19]/95 backdrop-blur-md border-t border-slate-800 px-3 py-2.5 shadow-2xl">
+    <div class="max-w-xl mx-auto grid grid-cols-4 gap-2 items-center">
+      <button onclick="prevQuestion()" id="btn-mobile-prev" class="py-2.5 px-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-200 border border-slate-700 flex items-center justify-center gap-1 disabled:opacity-40">
+        <span>←</span> <span>上一題</span>
+      </button>
+      <button onclick="toggleStarCurrent()" class="py-2.5 px-2 rounded-xl text-xs font-bold bg-slate-800 text-amber-300 border border-slate-700 flex items-center justify-center gap-1">
+        <span id="mobile-star-icon">☆</span> <span>收藏</span>
+      </button>
+      <button onclick="scrollToOrRevealAnalysis()" class="py-2.5 px-2 rounded-xl text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center gap-1">
+        <span>🧠</span> <span>看解析</span>
+      </button>
+      <button onclick="nextQuestion()" id="btn-mobile-next" class="py-2.5 px-2 rounded-xl text-xs font-bold bg-cyan-500 text-slate-950 shadow-md flex items-center justify-center gap-1 disabled:opacity-40">
+        <span>下一題</span> <span>→</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- 引入題庫與科目設定資料檔 -->
+  <script src="exam_data.js"></script>
+
+  <script>
+    const SUBJECT_CONFIG = window.EXAM_SUBJECT_CONFIG || {
+      storageKey: 'UNIVERSAL_EXAM_STATE_V1',
+      title: '萬用考題拆解與視覺化複習系統',
+      badge: 'Universal Exam',
+      subtitle: '演算法決策路徑定位 ‧ 易混淆陷阱拆解 ‧ 最新法規與觀念檢核',
+      icon: '🎯',
+      defaultTheme: 'dark',
+      cardTitles: {
+        algorithm: '解題思考決策路徑 (Step-by-Step Path)',
+        trap: '易混淆誘答陷阱拆解 (Confusion Trap Alert)',
+        guideline: '最新法規 / 指引 / 課綱核心觀念檢核'
+      },
+      highlightTerms: [],
+      categories: [],
+      cheatSheets: []
+    };
+
+    const ALL_QUESTIONS = Array.isArray(window.EXAM_QUESTIONS) ? window.EXAM_QUESTIONS : [];
+    const STORAGE_KEY = SUBJECT_CONFIG.storageKey || 'UNIVERSAL_EXAM_STATE_V1';
+
+    let userState = {
+      answers: {},
+      starred: {},
+      notes: {},
+      theme: SUBJECT_CONFIG.defaultTheme || 'dark',
+      lastQuestionId: null
+    };
+
+    let filterState = { category: 'all', mode: 'all', year: 'all', search: '' };
+    let filteredQuestions = [...ALL_QUESTIONS];
+    let currentIndex = 0;
+    let showTriggerHints = false;
+    let manualRevealMap = {};
+    let isRadarCollapsed = false;
+    let isLightboxZoomed = false;
+
+    function applyTheme(theme) {
+      const htmlEl = document.documentElement;
+      if (theme === 'light') {
+        htmlEl.classList.remove('dark');
+        htmlEl.classList.add('light');
+        document.getElementById('theme-icon').textContent = '☀️';
+        document.getElementById('theme-text').textContent = '明亮護眼';
+      } else {
+        htmlEl.classList.remove('light');
+        htmlEl.classList.add('dark');
+        document.getElementById('theme-icon').textContent = '🌙';
+        document.getElementById('theme-text').textContent = '深色戰情室';
+      }
+      userState.theme = theme;
+      saveUserState();
+    }
+
+    function toggleThemeMode() {
+      applyTheme(userState.theme === 'light' ? 'dark' : 'light');
+    }
+
+    function initSubjectMetadata() {
+      document.getElementById('page-doc-title').textContent = SUBJECT_CONFIG.title;
+      document.getElementById('brand-title').textContent = SUBJECT_CONFIG.title;
+      document.getElementById('brand-badge').textContent = SUBJECT_CONFIG.badge || '';
+      document.getElementById('brand-subtitle').textContent = SUBJECT_CONFIG.subtitle || '';
+      document.getElementById('brand-icon').textContent = SUBJECT_CONFIG.icon || '🎯';
+
+      if (SUBJECT_CONFIG.cardTitles) {
+        if (SUBJECT_CONFIG.cardTitles.algorithm) document.getElementById('card-title-algorithm').textContent = SUBJECT_CONFIG.cardTitles.algorithm;
+        if (SUBJECT_CONFIG.cardTitles.trap) document.getElementById('card-title-trap').textContent = SUBJECT_CONFIG.cardTitles.trap;
+        if (SUBJECT_CONFIG.cardTitles.guideline) document.getElementById('card-title-guideline').textContent = SUBJECT_CONFIG.cardTitles.guideline;
+      }
+
+      // 動態建立年度/來源下拉選項
+      const prefixes = [...new Set(ALL_QUESTIONS.map(q => q.id.split('-')[0]))];
+      const yearSelect = document.getElementById('year-select');
+      yearSelect.innerHTML = `<option value="all" class="bg-slate-900">全部 (${ALL_QUESTIONS.length}題)</option>` +
+        prefixes.map(p => {
+          const cnt = ALL_QUESTIONS.filter(q => q.id.split('-')[0] === p).length;
+          return `<option value="${p}" class="bg-slate-900">${p} (${cnt}題)</option>`;
+        }).join('');
+
+      // 動態建立速查表分頁
+      const sheets = Array.isArray(SUBJECT_CONFIG.cheatSheets) ? SUBJECT_CONFIG.cheatSheets : [];
+      const tabHeader = document.getElementById('cheatsheet-tabs-header');
+      const tabBody = document.getElementById('cheatsheet-tabs-body');
+      if (sheets.length > 0) {
+        tabHeader.innerHTML = sheets.map((s, idx) => `
+          <button onclick="switchCheatTab(${idx})" id="cheat-tab-btn-${idx}" class="px-3.5 py-2 rounded-t-xl text-xs sm:text-sm font-bold transition">
+            ${s.tabTitle}
+          </button>
+        `).join('');
+        tabBody.innerHTML = sheets.map((s, idx) => `
+          <div id="cheat-tab-content-${idx}" class="${idx === 0 ? '' : 'hidden'} space-y-4">
+            ${s.htmlContent}
+          </div>
+        `).join('');
+      } else {
+        tabHeader.innerHTML = '';
+        tabBody.innerHTML = '<p class="text-slate-400">尚未設定速查表內容。</p>';
+      }
+    }
+
+    function loadUserState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          userState.answers = parsed.answers || {};
+          userState.starred = parsed.starred || {};
+          userState.notes = parsed.notes || {};
+          userState.theme = parsed.theme || SUBJECT_CONFIG.defaultTheme || 'dark';
+          userState.lastQuestionId = parsed.lastQuestionId || null;
+        }
+      } catch (e) { console.warn(e); }
+    }
+
+    function saveUserState() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(userState)); } catch (e) { console.warn(e); }
+    }
+
+    function isOptionCorrect(question, letter) {
+      return Array.isArray(question.answer) ? question.answer.includes(letter) : question.answer === letter;
+    }
+
+    function formatAnswerDisplay(question) {
+      return Array.isArray(question.answer) ? question.answer.join(' 或 ') : question.answer;
+    }
+
+    function getCategoriesList() {
+      if (Array.isArray(SUBJECT_CONFIG.categories) && SUBJECT_CONFIG.categories.length > 0) {
+        return SUBJECT_CONFIG.categories;
+      }
+      const uniqueNames = [...new Set(ALL_QUESTIONS.map(q => q.category))];
+      return uniqueNames.map(name => ({ name, icon: '📌', short: name }));
+    }
+
+    function renderDashboardAndFilters() {
+      const totalCount = ALL_QUESTIONS.length;
+      const answeredIds = Object.keys(userState.answers);
+      const answeredCount = answeredIds.length;
+      const correctCount = answeredIds.filter(id => userState.answers[id]?.isCorrect).length;
+      const wrongCount = answeredIds.filter(id => userState.answers[id] && !userState.answers[id].isCorrect).length;
+      const starredCount = Object.keys(userState.starred).filter(id => userState.starred[id]).length;
+
+      document.getElementById('nav-answered-count').textContent = `${answeredCount} / ${totalCount}`;
+      const overallAcc = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : null;
+      const navAccEl = document.getElementById('nav-accuracy-rate');
+      navAccEl.textContent = overallAcc === null ? '--%' : `${overallAcc}%`;
+      navAccEl.className = overallAcc !== null && overallAcc < 70 ? 'font-mono font-bold text-rose-400' : 'font-mono font-bold text-emerald-400';
+      document.getElementById('nav-star-count').textContent = starredCount;
+
+      document.getElementById('count-all').textContent = totalCount;
+      document.getElementById('count-unanswered').textContent = totalCount - answeredCount;
+      document.getElementById('count-wrong').textContent = wrongCount;
+      document.getElementById('count-starred').textContent = starredCount;
+      document.getElementById('count-ecg').textContent = ALL_QUESTIONS.filter(q => Boolean(q.image)).length;
+      document.getElementById('count-disputed').textContent = ALL_QUESTIONS.filter(q => Boolean(q.is_disputed)).length;
+
+      const categories = getCategoriesList();
+      document.getElementById('category-radar-grid').innerHTML = categories.map(cat => {
+        const catQs = ALL_QUESTIONS.filter(q => q.category === cat.name);
+        const catTotal = catQs.length;
+        const catAnswered = catQs.filter(q => userState.answers[q.id]).length;
+        const catCorrect = catQs.filter(q => userState.answers[q.id]?.isCorrect).length;
+        const acc = catAnswered > 0 ? Math.round((catCorrect / catAnswered) * 100) : null;
+        const completionPct = catTotal > 0 ? Math.round((catAnswered / catTotal) * 100) : 0;
+        const isSelected = filterState.category === cat.name;
+
+        let accBadgeClass = 'bg-slate-800 text-slate-400 border-slate-700';
+        let barColorClass = 'bg-cyan-500';
+        let cardBorderClass = isSelected
+          ? 'border-cyan-400 ring-2 ring-cyan-500/30 bg-slate-900'
+          : 'border-slate-800/90 bg-slate-900/60 hover:bg-slate-900';
+
+        if (acc !== null) {
+          if (acc < 60) {
+            accBadgeClass = 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+            barColorClass = 'bg-rose-500';
+          } else if (acc < 70) {
+            accBadgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+            barColorClass = 'bg-amber-500';
+          } else {
+            accBadgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+            barColorClass = 'bg-emerald-500';
+          }
+        }
+
+        return `
+          <button onclick="toggleCategoryFilter('${cat.name}')" class="text-left p-3 rounded-xl border transition flex flex-col justify-between gap-2 ${cardBorderClass}">
+            <div class="flex items-start justify-between gap-1">
+              <div class="flex items-center gap-1.5">
+                <span class="text-sm">${cat.icon || '📌'}</span>
+                <span class="text-xs font-bold text-slate-100 leading-tight">${cat.short || cat.name}</span>
+              </div>
+              <span class="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded border ${accBadgeClass}">
+                ${acc === null ? '未測' : `${acc}%`}
+              </span>
+            </div>
+            <div class="space-y-1 w-full">
+              <div class="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span>完成 ${catAnswered}/${catTotal}</span>
+                <span>${acc !== null && acc < 70 ? '⚠️ 需加強' : `${completionPct}%`}</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full ${barColorClass} transition-all duration-300" style="width: ${completionPct}%"></div>
+              </div>
+            </div>
+          </button>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.filter-pill').forEach(btn => {
+        const mode = btn.getAttribute('data-mode');
+        btn.className = mode === filterState.mode
+          ? 'filter-pill px-3 py-1.5 rounded-lg text-xs font-bold transition bg-cyan-500 text-slate-950 shadow-md'
+          : 'filter-pill px-3 py-1.5 rounded-lg text-xs font-bold transition bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800';
+      });
+
+      const hasActiveFilter = filterState.category !== 'all' || filterState.mode !== 'all' || filterState.year !== 'all' || filterState.search.trim() !== '';
+      document.getElementById('reset-filter-btn').classList.toggle('hidden', !hasActiveFilter);
+    }
+
+    function applyFilters(preserveCurrentId = true) {
+      const currentQId = filteredQuestions[currentIndex]?.id;
+      const kw = filterState.search.trim().toLowerCase();
+
+      filteredQuestions = ALL_QUESTIONS.filter(q => {
+        if (filterState.category !== 'all' && q.category !== filterState.category) return false;
+        if (filterState.year !== 'all' && q.id.split('-')[0] !== filterState.year) return false;
+        if (filterState.mode === 'unanswered' && userState.answers[q.id]) return false;
+        if (filterState.mode === 'wrong' && (!userState.answers[q.id] || userState.answers[q.id].isCorrect)) return false;
+        if (filterState.mode === 'starred' && !userState.starred[q.id]) return false;
+        if (filterState.mode === 'ecg' && !q.image) return false;
+        if (filterState.mode === 'disputed' && !q.is_disputed) return false;
+        if (kw) {
+          const hay = [q.id, q.question, ...(q.options || []), ...(q.key_triggers || []), ...(q.algorithm_path || []), q.confusion_trap || '', q.guideline_check || '', userState.notes[q.id] || ''].join(' ').toLowerCase();
+          if (!hay.includes(kw)) return false;
+        }
+        return true;
+      });
+
+      renderDashboardAndFilters();
+      const emptyBox = document.getElementById('empty-state-box');
+      const workspace = document.getElementById('main-workspace');
+      if (filteredQuestions.length === 0) {
+        emptyBox.classList.remove('hidden');
+        workspace.classList.add('hidden');
+        return;
+      }
+      emptyBox.classList.add('hidden');
+      workspace.classList.remove('hidden');
+
+      if (preserveCurrentId && currentQId) {
+        const idx = filteredQuestions.findIndex(q => q.id === currentQId);
+        currentIndex = idx >= 0 ? idx : 0;
+      } else {
+        currentIndex = 0;
+      }
+      renderCurrentQuestion();
+    }
+
+    function formatRichText(text) {
+      if (!text) return '';
+      let safe = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong class="text-amber-300 font-bold">$1</strong>');
+      safe = safe.replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 rounded bg-cyan-950/80 text-cyan-300 font-mono text-xs border border-cyan-500/30">$1</code>');
+      const terms = Array.isArray(SUBJECT_CONFIG.highlightTerms) ? SUBJECT_CONFIG.highlightTerms : [];
+      terms.forEach(term => {
+        const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        safe = safe.replace(new RegExp(`\\b(${escaped})\\b`, 'g'), '<span class="text-cyan-300 font-semibold">$1</span>');
+      });
+      return safe;
+    }
+
+    function renderCurrentQuestion() {
+      const q = filteredQuestions[currentIndex];
+      if (!q) return;
+      userState.lastQuestionId = q.id;
+      saveUserState();
+
+      document.getElementById('q-index-badge').textContent = `#${currentIndex + 1} / ${filteredQuestions.length}`;
+      document.getElementById('q-id-badge').textContent = q.id;
+      document.getElementById('q-category-badge').textContent = q.category;
+      document.getElementById('q-disputed-badge').classList.toggle('hidden', !q.is_disputed);
+      document.getElementById('q-ecg-badge').classList.toggle('hidden', !q.image);
+
+      const isStarred = Boolean(userState.starred[q.id]);
+      document.getElementById('star-icon').textContent = isStarred ? '⭐' : '☆';
+      document.getElementById('star-text').textContent = isStarred ? '已標記待加強' : '標記待加強';
+      document.getElementById('btn-toggle-star').className = isStarred
+        ? 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition bg-amber-500/20 text-amber-300 border-amber-500/50'
+        : 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition bg-slate-800/80 text-slate-300 border-slate-700';
+
+      document.getElementById('trigger-btn-text').textContent = showTriggerHints ? '隱藏線索' : '破題線索';
+      document.getElementById('btn-toggle-triggers').className = showTriggerHints
+        ? 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition bg-cyan-500/20 text-cyan-300 border-cyan-500/50'
+        : 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition bg-slate-800/80 text-slate-300 border-slate-700';
+
+      const triggerBox = document.getElementById('trigger-pills-box');
+      let stemHtml = q.question.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      if (showTriggerHints && Array.isArray(q.key_triggers) && q.key_triggers.length > 0) {
+        triggerBox.classList.remove('hidden');
+        document.getElementById('trigger-pills-list').innerHTML = q.key_triggers.map(t => `<span class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-cyan-500/20 text-cyan-200 border border-cyan-500/40">🔑 ${t}</span>`).join('');
+        q.key_triggers.forEach(trig => {
+          const cleanTrig = trig.split('(')[0].split('：')[0].trim();
+          if (cleanTrig.length >= 2 && stemHtml.includes(cleanTrig)) {
+            stemHtml = stemHtml.split(cleanTrig).join(`<mark class="trigger-mark">${cleanTrig}</mark>`);
+          }
+        });
+      } else {
+        triggerBox.classList.add('hidden');
+      }
+      document.getElementById('q-stem-text').innerHTML = stemHtml;
+
+      const imgContainer = document.getElementById('q-image-container');
+      const imgEl = document.getElementById('q-ecg-image');
+      if (q.image) {
+        imgContainer.classList.remove('hidden');
+        imgEl.src = q.image;
+      } else {
+        imgContainer.classList.add('hidden');
+        imgEl.src = '';
+      }
+
+      const ansRecord = userState.answers[q.id];
+      const isAnswered = Boolean(ansRecord);
+      const isRevealed = isAnswered || Boolean(manualRevealMap[q.id]);
+      const letters = ['A', 'B', 'C', 'D'];
+
+      document.getElementById('q-options-list').innerHTML = q.options.map((optText, idx) => {
+        const letter = letters[idx] || String.fromCharCode(65 + idx);
+        const cleanOptText = optText.replace(/^\([A-D]\)\s*/, '');
+        const isCorrectOpt = isOptionCorrect(q, letter);
+        const isSelectedOpt = ansRecord?.selected === letter;
+
+        let btnStyle = 'bg-slate-900/85 hover:bg-slate-800/90 border-slate-800 hover:border-cyan-500/40 text-slate-200';
+        let badgeStyle = 'bg-slate-800 text-slate-300 border-slate-700';
+        let statusTag = '';
+
+        if (isRevealed) {
+          if (isCorrectOpt) {
+            btnStyle = 'bg-emerald-950/40 border-emerald-500/70 text-emerald-100';
+            badgeStyle = 'bg-emerald-500 text-slate-950 font-black border-emerald-400';
+            statusTag = `<span class="ml-auto text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0">✓ 正確答案</span>`;
+          } else if (isSelectedOpt && !isCorrectOpt) {
+            btnStyle = 'bg-rose-950/40 border-rose-500/70 text-rose-100';
+            badgeStyle = 'bg-rose-500 text-white font-black border-rose-400';
+            statusTag = `<span class="ml-auto text-xs font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 shrink-0">✗ 您的選擇</span>`;
+          } else {
+            btnStyle = 'bg-slate-900/40 border-slate-800/60 text-slate-400 opacity-75';
+          }
+        }
+
+        return `
+          <button onclick="selectOption('${letter}')" class="w-full text-left p-3.5 sm:p-4 rounded-xl border-2 transition flex items-start gap-3 ${btnStyle}">
+            <span class="w-7 h-7 rounded-lg border flex items-center justify-center text-xs font-mono font-bold shrink-0 mt-0.5 ${badgeStyle}">${letter}</span>
+            <span class="text-sm sm:text-base font-medium leading-relaxed flex-1">${cleanOptText}</span>
+            ${statusTag}
+          </button>
+        `;
+      }).join('');
+
+      const bannerEl = document.getElementById('q-result-banner');
+      if (isAnswered) {
+        bannerEl.classList.remove('hidden');
+        bannerEl.className = ansRecord.isCorrect
+          ? 'rounded-xl p-3.5 border flex flex-wrap items-center justify-between gap-2 bg-emerald-950/40 border-emerald-500/50'
+          : 'rounded-xl p-3.5 border flex flex-wrap items-center justify-between gap-2 bg-rose-950/40 border-rose-500/50';
+        document.getElementById('q-result-text').innerHTML = ansRecord.isCorrect
+          ? `<span class="text-emerald-400">🎉 答對了！</span> <span>標準答案為 (${formatAnswerDisplay(q)})。</span>`
+          : `<span class="text-rose-400">⚠️ 答錯了！</span> <span>您選 (${ansRecord.selected})，正確答案為 <b class="text-emerald-300 font-mono">(${formatAnswerDisplay(q)})</b>。</span>`;
+      } else {
+        bannerEl.classList.add('hidden');
+      }
+
+      document.getElementById('q-user-note').value = userState.notes[q.id] || '';
+      const atFirst = currentIndex <= 0;
+      const atLast = currentIndex >= filteredQuestions.length - 1;
+      document.getElementById('btn-prev-q').disabled = atFirst;
+      document.getElementById('btn-next-q').disabled = atLast;
+      document.getElementById('btn-reveal-analysis').classList.toggle('hidden', isRevealed);
+      document.getElementById('btn-mobile-prev').disabled = atFirst;
+      document.getElementById('btn-mobile-next').disabled = atLast;
+      document.getElementById('mobile-star-icon').textContent = isStarred ? '⭐' : '☆';
+
+      const lockedCard = document.getElementById('analysis-locked-card');
+      const unlockedBox = document.getElementById('analysis-unlocked-container');
+      if (!isRevealed) {
+        lockedCard.classList.remove('hidden');
+        unlockedBox.classList.add('hidden');
+      } else {
+        lockedCard.classList.add('hidden');
+        unlockedBox.classList.remove('hidden');
+
+        const pathSteps = Array.isArray(q.algorithm_path) ? q.algorithm_path : [];
+        document.getElementById('algorithm-flowchart-box').innerHTML = pathSteps.map((step, i) => {
+          const isLast = i === pathSteps.length - 1;
+          const nodeColor = isLast
+            ? 'bg-emerald-950/70 border-emerald-400/70 text-emerald-100 font-bold shadow-md'
+            : 'bg-slate-900/90 border-slate-700/90 text-slate-200';
+          const badgeColor = isLast ? 'bg-emerald-400 text-slate-950' : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40';
+          return `
+            <div class="flex flex-col items-stretch">
+              <div class="rounded-xl p-3 border ${nodeColor} flex items-start gap-2.5 text-xs sm:text-sm leading-relaxed">
+                <span class="w-5 h-5 rounded-md ${badgeColor} flex items-center justify-center text-[11px] font-mono font-bold shrink-0 mt-0.5">${i + 1}</span>
+                <div class="flex-1">${formatRichText(step)}</div>
+              </div>
+              ${!isLast ? '<div class="flex items-center justify-center py-0.5"><div class="w-0.5 h-3.5 bg-gradient-to-b from-cyan-400 to-emerald-400"></div></div>' : ''}
+            </div>
+          `;
+        }).join('');
+
+        const disputedAlert = document.getElementById('disputed-detail-alert');
+        if (q.is_disputed) {
+          disputedAlert.classList.remove('hidden');
+          document.getElementById('disputed-official-ans').textContent = q.official_answer || formatAnswerDisplay(q);
+        } else {
+          disputedAlert.classList.add('hidden');
+        }
+
+        const trapLines = (q.confusion_trap || '').split('\n').map(l => l.replace(/^•\s*/, '').trim()).filter(Boolean);
+        document.getElementById('confusion-trap-list').innerHTML = trapLines.map(line => `
+          <li class="flex items-start gap-2 bg-amber-950/20 border border-amber-500/20 rounded-xl p-3">
+            <span class="text-amber-400 font-bold mt-0.5 shrink-0">▸</span>
+            <span class="flex-1">${formatRichText(line)}</span>
+          </li>
+        `).join('');
+
+        const guideLines = (q.guideline_check || '').split('\n').map(l => l.replace(/^•\s*/, '').trim()).filter(Boolean);
+        document.getElementById('guideline-check-list').innerHTML = guideLines.map(line => `
+          <li class="flex items-start gap-2 bg-cyan-950/20 border border-cyan-500/20 rounded-xl p-3">
+            <span class="text-cyan-400 font-bold mt-0.5 shrink-0">✔</span>
+            <span class="flex-1">${formatRichText(line)}</span>
+          </li>
+        `).join('');
+      }
+    }
+
+    function selectOption(letter) {
+      const q = filteredQuestions[currentIndex];
+      if (!q) return;
+      userState.answers[q.id] = { selected: letter, isCorrect: isOptionCorrect(q, letter), timestamp: Date.now() };
+      saveUserState();
+      renderDashboardAndFilters();
+      renderCurrentQuestion();
+    }
+
+    function clearCurrentAnswer() {
+      const q = filteredQuestions[currentIndex];
+      if (!q) return;
+      delete userState.answers[q.id];
+      delete manualRevealMap[q.id];
+      saveUserState();
+      renderDashboardAndFilters();
+      renderCurrentQuestion();
+    }
+
+    function revealAnalysisManually() {
+      const q = filteredQuestions[currentIndex];
+      if (!q) return;
+      manualRevealMap[q.id] = true;
+      renderCurrentQuestion();
+    }
+
+    function scrollToOrRevealAnalysis() {
+      const q = filteredQuestions[currentIndex];
+      if (!q) return;
+      manualRevealMap[q.id] = true;
+      renderCurrentQuestion();
+      setTimeout(() => {
+        document.getElementById('analysis-unlocked-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 60);
+    }
+
+    function toggleStarCurrent() {
+      const q = filteredQuestions[currentIndex];
+      if (!q) return;
+      if (userState.starred[q.id]) delete userState.starred[q.id];
+      else userState.starred[q.id] = true;
+      saveUserState();
+      renderDashboardAndFilters();
+      renderCurrentQuestion();
+    }
+
+    function toggleTriggerHints() {
+      showTriggerHints = !showTriggerHints;
+      renderCurrentQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentIndex > 0) { currentIndex--; renderCurrentQuestion(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    }
+
+    function nextQuestion() {
+      if (currentIndex < filteredQuestions.length - 1) { currentIndex++; renderCurrentQuestion(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    }
+
+    let noteTimer = null;
+    function handleNoteInput(val) {
+      const q = filteredQuestions[currentIndex];
+      if (!q) return;
+      if (val.trim()) userState.notes[q.id] = val;
+      else delete userState.notes[q.id];
+      saveUserState();
+      const ind = document.getElementById('note-save-indicator');
+      ind.classList.remove('opacity-0');
+      clearTimeout(noteTimer);
+      noteTimer = setTimeout(() => ind.classList.add('opacity-0'), 1500);
+    }
+
+    function toggleCategoryFilter(catName) {
+      filterState.category = filterState.category === catName ? 'all' : catName;
+      applyFilters(false);
+    }
+    function setFilterMode(mode) { filterState.mode = mode; applyFilters(false); }
+    function setYearFilter(yr) { filterState.year = yr; applyFilters(false); }
+    function handleSearchInput(val) {
+      filterState.search = val;
+      document.getElementById('clear-search-btn').classList.toggle('hidden', !val);
+      applyFilters(false);
+    }
+    function clearSearchInput() {
+      document.getElementById('search-input').value = '';
+      filterState.search = '';
+      document.getElementById('clear-search-btn').classList.add('hidden');
+      applyFilters(false);
+    }
+    function resetFilters() {
+      filterState = { category: 'all', mode: 'all', year: 'all', search: '' };
+      document.getElementById('year-select').value = 'all';
+      document.getElementById('search-input').value = '';
+      document.getElementById('clear-search-btn').classList.add('hidden');
+      applyFilters(true);
+    }
+    function toggleRadarCollapse() {
+      isRadarCollapsed = !isRadarCollapsed;
+      document.getElementById('category-radar-grid').classList.toggle('hidden', isRadarCollapsed);
+      document.getElementById('radar-collapse-text').textContent = isRadarCollapsed ? '展開雷達' : '收合雷達';
+    }
+
+    function openLightbox() {
+      const q = filteredQuestions[currentIndex];
+      if (!q || !q.image) return;
+      document.getElementById('lightbox-img').src = q.image;
+      document.getElementById('lightbox-title').textContent = `${q.id} 圖表高畫質檢視`;
+      document.getElementById('lightbox-modal').classList.remove('hidden');
+    }
+    function toggleLightboxZoom() {
+      const img = document.getElementById('lightbox-img');
+      const btn = document.getElementById('btn-lightbox-zoom');
+      const scrollArea = document.getElementById('lightbox-scroll-area');
+      isLightboxZoomed = !isLightboxZoomed;
+      if (isLightboxZoomed) {
+        img.className = 'w-[180vw] sm:w-[150vw] max-w-none max-h-none object-contain bg-white p-2 sm:p-3 rounded-2xl shadow-2xl border-2 border-cyan-500/40 cursor-zoom-out transition-all duration-200';
+        scrollArea.classList.remove('items-center', 'justify-center');
+        scrollArea.classList.add('items-start', 'justify-start');
+        btn.textContent = '🔍 恢復 100% 適應大小';
+      } else {
+        img.className = 'max-w-full max-h-[85vh] object-contain bg-white p-2 sm:p-3 rounded-2xl shadow-2xl border-2 border-cyan-500/40 cursor-zoom-in transition-all duration-200';
+        scrollArea.classList.add('items-center', 'justify-center');
+        scrollArea.classList.remove('items-start', 'justify-start');
+        btn.textContent = '🔍 切換 200% 放大';
+      }
+    }
+    function closeLightbox() {
+      if (isLightboxZoomed) toggleLightboxZoom();
+      document.getElementById('lightbox-modal').classList.add('hidden');
+    }
+
+    function openCheatSheetModal() {
+      document.getElementById('cheatsheet-modal').classList.remove('hidden');
+      switchCheatTab(0);
+    }
+    function closeCheatSheetModal() { document.getElementById('cheatsheet-modal').classList.add('hidden'); }
+    function switchCheatTab(tabIdx) {
+      const sheets = Array.isArray(SUBJECT_CONFIG.cheatSheets) ? SUBJECT_CONFIG.cheatSheets : [];
+      sheets.forEach((_, i) => {
+        const btn = document.getElementById(`cheat-tab-btn-${i}`);
+        const pane = document.getElementById(`cheat-tab-content-${i}`);
+        if (!btn || !pane) return;
+        if (i === tabIdx) {
+          btn.className = 'px-3.5 py-2 rounded-t-xl text-xs sm:text-sm font-bold transition bg-[#0b1323] text-amber-300 border-t border-x border-amber-500/40';
+          pane.classList.remove('hidden');
+        } else {
+          btn.className = 'px-3.5 py-2 rounded-t-xl text-xs sm:text-sm font-bold transition bg-slate-900/50 text-slate-400 hover:text-slate-200';
+          pane.classList.add('hidden');
+        }
+      });
+    }
+
+    function openQuestionMatrixModal() {
+      document.getElementById('matrix-grid-container').innerHTML = filteredQuestions.map((q, idx) => {
+        const ans = userState.answers[q.id];
+        const starred = userState.starred[q.id];
+        let cls = 'bg-slate-900 text-slate-300 border-slate-800';
+        if (ans) cls = ans.isCorrect ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/50' : 'bg-rose-950/60 text-rose-300 border-rose-500/50';
+        if (starred) cls += ' ring-2 ring-amber-400/70';
+        return `<button onclick="jumpToQuestionIndex(${idx})" class="p-2.5 rounded-xl border text-xs font-mono font-bold transition flex flex-col items-center justify-center gap-0.5 ${cls}"><div>${q.id}${starred ? ' ⭐' : ''}</div><span class="text-[10px] font-sans font-normal text-slate-400 truncate max-w-full">${q.category}</span></button>`;
+      }).join('');
+      document.getElementById('matrix-modal').classList.remove('hidden');
+    }
+    function closeQuestionMatrixModal() { document.getElementById('matrix-modal').classList.add('hidden'); }
+    function jumpToQuestionIndex(idx) { currentIndex = idx; closeQuestionMatrixModal(); renderCurrentQuestion(); }
+    function toggleDataMenu() { document.getElementById('data-menu-dropdown').classList.toggle('hidden'); }
+
+    function exportProgressJSON() {
+      toggleDataMenu();
+      const blob = new Blob([JSON.stringify(userState, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `exam_progress_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importProgressJSON(event) {
+      toggleDataMenu();
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          userState.answers = imported.answers || {};
+          userState.starred = imported.starred || {};
+          userState.notes = imported.notes || {};
+          saveUserState();
+          renderDashboardAndFilters();
+          renderCurrentQuestion();
+        } catch (err) { alert('JSON 格式錯誤'); }
+      };
+      reader.readAsText(file);
+    }
+
+    function resetAllProgress() {
+      toggleDataMenu();
+      if (confirm('確定要重置所有作答紀錄與星號嗎？')) {
+        userState.answers = {};
+        userState.starred = {};
+        manualRevealMap = {};
+        saveUserState();
+        applyFilters(true);
+      }
+    }
+
+    window.addEventListener('keydown', e => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.key === 'Escape') { closeLightbox(); closeCheatSheetModal(); closeQuestionMatrixModal(); return; }
+      const k = e.key.toUpperCase();
+      if (k === '1' || k === 'A') selectOption('A');
+      else if (k === '2' || k === 'B') selectOption('B');
+      else if (k === '3' || k === 'C') selectOption('C');
+      else if (k === '4' || k === 'D') selectOption('D');
+      else if (e.key === 'ArrowLeft') prevQuestion();
+      else if (e.key === 'ArrowRight') nextQuestion();
+      else if (k === 'S') toggleStarCurrent();
+      else if (k === 'H') toggleTriggerHints();
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadUserState();
+      initSubjectMetadata();
+      applyTheme(userState.theme || SUBJECT_CONFIG.defaultTheme || 'dark');
+      renderDashboardAndFilters();
+      if (userState.lastQuestionId) {
+        const idx = filteredQuestions.findIndex(q => q.id === userState.lastQuestionId);
+        if (idx >= 0) currentIndex = idx;
+      }
+      renderCurrentQuestion();
+    });
+  </script>
+</body>
+</html>

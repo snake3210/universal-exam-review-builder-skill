@@ -1,0 +1,56 @@
+[
+  {
+    "id": "114-55",
+    "question": "56 歲男性餐後出現胸悶、血壓84/52mmHg、脈搏54 次/min、血氧96%、體溫36.5oC。十二導程心電圖結果如下圖,依據此心電圖變化,對於判斷病變位置及正確的到院前處置下列何者最適當?",
+    "options": [
+      "(A) 前壁STEMI,立即給予硝化甘油與高流量氧氣。",
+      "(B) 下壁STEMI,避免硝化甘油並維持靜脈輸液。",
+      "(C) 前壁NSTEMI,給予腎上腺素與阿斯匹靈。",
+      "(D) 下壁NSTEMI,給予硝化甘油並將病人採半坐臥姿勢。"
+    ],
+    "answer": "B",
+    "category": "ACS與12導程",
+    "algorithm_path": [
+      "缺血性胸悶評估 (BP 84/52mmHg 低血壓、HR 54 bpm 緩脈、SpO2 96%)",
+      "判讀題附 12 導程心電圖：Lead II, III, aVF 出現顯著 ST 段上升，且 Lead I, aVL 出現鏡像 ST 段壓低 → 確診為下壁 STEMI",
+      "下壁 STEMI 合併低血壓 (84/52mmHg) 與緩脈 → 高度懷疑合併右心室梗塞 (RV Infarction)",
+      "處置決策：絕對禁用硝化甘油 (NTG)，建立靜脈管路給予生理食鹽水輸液以維持右心室前負荷 (Preload)"
+    ],
+    "key_triggers": [
+      "血壓84/52mmHg",
+      "脈搏54 次/min",
+      "血氧96%",
+      "II, III, aVF ST 段上升 (下壁 STEMI)",
+      "避免硝化甘油並維持靜脈輸液"
+    ],
+    "confusion_trap": "• 陷阱一（MONA 反射性給藥錯誤）：看到胸悶加 **STEMI** 就想選給 `NTG`（選項 A、D），忽略了「**下壁 STEMI 常合併右心室梗塞**」且病人收縮壓僅 84 mmHg（< 90 mmHg），給予 NTG 會使靜脈回心血量驟降引發休克！\n• 陷阱二（常規高流量給氧錯誤）：病人血氧飽和度為 **96%（≥ 90%）**，依最新指引不需給予高流量氧氣（選項 A 錯誤）。",
+    "guideline_check": "• 完全符合 AHA 2020/2025 ACS 指引：\n• 1. 僅在 **SpO2 < 90%** 或有呼吸窘迫時才給予氧氣。\n• 2. 下壁 STEMI 應加做右側心電圖（`V4R`），在排除右心室梗塞前或 **SBP < 90 mmHg** 時，絕對禁用硝酸鹽類藥物（NTG），應給予生理食鹽水輸液。",
+    "image": "images/114-55.png"
+  },
+  {
+    "id": "113-100",
+    "question": "有關心律不整藥物處置,下列何者最不適當?",
+    "options": [
+      "(A) 45 歲男性運動時昏倒冒汗,到院後十二導程心電圖判讀Mobitz type II AV block,血壓量測70/42mmHg。可考慮給予epinephrine 2~10 mcg/min,調整至病人有反應。",
+      "(B) 60 歲女性胸悶痛感覺快暈厥,十二導程心電圖呈現II, III, aVF 有ST 斷上升合併Mobitz type II AV block。心跳40 bpm、血壓量測60/40mmHg。啟動ACS 流程外,應考慮給予Atropine 1mg IVP 改善心律。",
+      "(C) 73 歲女性糖尿病足住院安排清創手術,晚上突然意識不清,EKG monitor 呈現polymorphic VT。若住院EKG 有QT prolong,可考慮給予MgSO4 1~2 gm IVD 15 分鐘。若血壓不穩定,考慮直接給予雙向波200 J 去顫電擊。",
+      "(D) 36 歲女性喝完咖啡心悸,無胸痛冒冷汗,呼吸平穩,到院血壓126/90mmHg,心電圖呈現寬且規則的QRS 波,心律160 cpm。無氣喘病史,可考慮給予adenosine 6mgIVP。"
+    ],
+    "answer": "B",
+    "category": "心搏過緩",
+    "algorithm_path": [
+      "有症狀之心搏過緩 (HR 40 bpm 且 BP 60/40mmHg 不穩定)",
+      "特殊解剖定位例外：Mobitz type II 二度二型或三度 AV block (病灶常位於希氏束以下 Infranodal)",
+      "Atropine 作用於房室結 (AV node) 迷走神經，對 Infranodal block 通常無效，應優先準備 TCP 或給予 Epinephrine / Dopamine 滴注"
+    ],
+    "key_triggers": [
+      "Mobitz type II AV block",
+      "Atropine 1mg IVP",
+      "寬且規則的QRS 波"
+    ],
+    "confusion_trap": "• 本題為「高階指引細節 vs 流程圖表面直覺」之經典爭議題（官方公告送分）：\n• 1. **原命題選 (B) 最不適當之理由**：`Mobitz Type II AV block` 阻滯位置常在希氏束以下，Atropine 難以發揮效果。\n• 2. **考生申訴送分之理由**：下壁心肌梗塞（RCA 阻塞）引起的傳導阻滯多位於 AV node 層級，且緩脈流程圖第一線仍列有 Atropine 1mg。",
+    "guideline_check": "• AHA 2020/2025 ACLS 指引重點：\n• 1. 心搏過緩 Atropine 初始劑量自 2020 年起由舊版 0.5 mg 調升為 **1 mg IVP**，最大總劑量 3 mg。\n• 2. 二度二型（Mobitz II）與三度 AV block 切勿過度依賴 Atropine，應立即準備經皮心臟節律器（`TCP`）。",
+    "is_disputed": true,
+    "official_answer": "B(送分)"
+  }
+]
