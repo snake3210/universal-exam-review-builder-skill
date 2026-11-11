@@ -535,15 +535,19 @@
       </div>
 
       <div class="grid grid-cols-2 gap-2.5 w-full pt-1">
-        <button onclick="copyShareUrl('modal-copy-btn-text')" class="py-2.5 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-1.5">
+        <button onclick="copyShareUrl('modal-copy-btn-text')" class="py-2.5 px-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-1.5">
           <span>📋</span>
           <span id="modal-copy-btn-text">複製網址</span>
         </button>
-        <button onclick="triggerNativeShare()" class="py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-black text-xs sm:text-sm transition flex items-center justify-center gap-1.5">
-          <span>📤</span>
-          <span>直接轉傳分享</span>
+        <button onclick="downloadQrCodeImage()" class="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-1.5">
+          <span>💾</span>
+          <span>下載 QR 圖檔</span>
         </button>
       </div>
+      <button onclick="triggerNativeShare()" class="w-full py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-black text-xs sm:text-sm transition flex items-center justify-center gap-1.5">
+        <span>📲</span>
+        <span>透過手機／系統選單直接分享給好友</span>
+      </button>
     </div>
   </div>
 
@@ -694,14 +698,9 @@
       document.getElementById('modal-share-url').textContent = shareUrl;
       document.getElementById('modal-share-title').textContent = SUBJECT_CONFIG.title || '';
 
-      if (SUBJECT_CONFIG.qrCodeSvg) {
-        document.getElementById('footer-qr-box').innerHTML = SUBJECT_CONFIG.qrCodeSvg;
-        document.getElementById('modal-qr-box').innerHTML = SUBJECT_CONFIG.qrCodeSvg;
-      } else {
-        const fallbackImg = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=256x256&margin=8&data=${encodeURIComponent(shareUrl)}" alt="QR Code" class="w-full h-full object-contain" />`;
-        document.getElementById('footer-qr-box').innerHTML = fallbackImg;
-        document.getElementById('modal-qr-box').innerHTML = fallbackImg;
-      }
+      const qrSrc = SUBJECT_CONFIG.qrCodeDataUri || `https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&data=${encodeURIComponent(shareUrl)}`;
+      document.getElementById('footer-qr-box').innerHTML = `<img src="${qrSrc}" alt="APP 網址 QR Code" class="w-full h-full object-contain" />`;
+      document.getElementById('modal-qr-box').innerHTML = `<img id="modal-qr-img" src="${qrSrc}" alt="${SUBJECT_CONFIG.title || 'APP'} QR Code" class="w-full h-full object-contain" />`;
     }
 
     function loadUserState() {
@@ -1207,6 +1206,14 @@
     function jumpToQuestionIndex(idx) { currentIndex = idx; closeQuestionMatrixModal(); renderCurrentQuestion(); }
     function toggleDataMenu() { document.getElementById('data-menu-dropdown').classList.toggle('hidden'); }
 
+    function downloadQrCodeImage() {
+      const qrImg = document.getElementById('modal-qr-img');
+      if (!qrImg) return;
+      const a = document.createElement('a');
+      a.href = qrImg.src;
+      a.download = 'Exam_Review_QRCode.png';
+      a.click();
+    }
     function openShareQrModal() {
       document.getElementById('share-qr-modal').classList.remove('hidden');
     }
